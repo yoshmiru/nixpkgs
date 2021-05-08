@@ -1,20 +1,22 @@
 { lib
 , buildPythonPackage
 , fetchFromGitHub
-, pythonOlder
-, msgpack
+, isPy27
 , nose
 , numpy
-, pydantic
-, pymongo
+, six
 , ruamel_yaml
-, tqdm
+, msgpack
+, coverage
+, coveralls
+, pymongo
+, lsof
 }:
 
 buildPythonPackage rec {
   pname = "monty";
   version = "2021.3.3";
-  disabled = pythonOlder "3.5"; # uses type annotations
+  disabled = isPy27; # uses type annotations
 
   # No tests in Pypi
   src = fetchFromGitHub {
@@ -24,28 +26,19 @@ buildPythonPackage rec {
     sha256 = "1nbv0ys0fv70rgzskkk8gsfr9dsmm7ykim5wv36li840zsj83b1l";
   };
 
-  propagatedBuildInputs = [
-    ruamel_yaml
-    tqdm
-    msgpack
-  ];
+  checkInputs = [ lsof nose numpy msgpack coverage coveralls pymongo];
+  propagatedBuildInputs = [ six ruamel_yaml ];
 
-  checkInputs = [
-    nose
-    numpy
-    pydantic
-    pymongo
-  ];
+  # test suite tries to decode bytes, but msgpack now returns a str
+  # https://github.com/materialsvirtuallab/monty/pull/121
+  postPatch = ''
+    substituteInPlace tests/test_serialization.py \
+      --replace ".decode('utf-8')" ""
+  '';
 
   preCheck = ''
     substituteInPlace tests/test_os.py \
       --replace 'self.assertEqual("/usr/bin/find", which("/usr/bin/find"))' '#'
-  '';
-
-  checkPhase = ''
-    runHook preCheck
-    nosetests -v
-    runHook postCheck
   '';
 
   meta = with lib; {
