@@ -116,7 +116,7 @@ let
           bintools = prevStage.binutils;
           isGNU = true;
           libc = getLibc prevStage;
-          inherit lib;
+          inherit lib config;
           inherit (prevStage) coreutils gnugrep;
           stdenvNoCC = prevStage.ccWrapperStdenv;
         };
@@ -328,7 +328,7 @@ in
         cc = prevStage.gcc-unwrapped;
         bintools = self.binutils;
         libc = getLibc self;
-        inherit lib;
+        inherit lib config;
         inherit (self) stdenvNoCC coreutils gnugrep;
         shell = self.bash + "/bin/bash";
       };

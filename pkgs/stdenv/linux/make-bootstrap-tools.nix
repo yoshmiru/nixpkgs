@@ -3,7 +3,10 @@
 }:
 
 let
-  pkgs = import ../../.. { inherit localSystem crossSystem; };
+  pkgs = import ../../.. {
+    config.inBootstrap = true;
+    inherit localSystem crossSystem;
+  };
   libc = pkgs.stdenv.cc.libc;
 in with pkgs; rec {
 
@@ -184,6 +187,7 @@ in with pkgs; rec {
         nuke-refs $out/libexec/gcc/*/*/*
         nuke-refs $out/lib/gcc/*/*/*
         nuke-refs $out/lib/gcc/*/*/include-fixed/*/*
+        nuke-refs $out/lib/gcc/*/*/include-fixed/*
 
         mkdir $out/.pack
         mv $out/* $out/.pack

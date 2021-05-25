@@ -17,6 +17,7 @@
 , isGNU ? false, isClang ? cc.isClang or false, gnugrep ? null
 , buildPackages ? {}
 , libcxx ? null
+, config
 }:
 
 with lib;
@@ -27,6 +28,8 @@ assert !nativeTools ->
 assert !(nativeLibc && noLibc);
 assert (noLibc || nativeLibc) == (libc == null);
 
+let cc' = if config.inBootstrap or false && cc ? override then cc.override { enableLTO = false; } else cc; in
+let cc = cc'; in
 let
   stdenv = stdenvNoCC;
   inherit (stdenv) hostPlatform targetPlatform;
