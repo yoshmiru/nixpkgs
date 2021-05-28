@@ -17,7 +17,7 @@
 , isGNU ? false, isClang ? cc.isClang or false, gnugrep ? null
 , buildPackages ? {}
 , libcxx ? null
-, config
+, config ? {}
 }:
 
 with lib;
