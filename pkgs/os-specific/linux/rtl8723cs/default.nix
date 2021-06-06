@@ -35,6 +35,5 @@ stdenv.mkDerivation rec {
     homepage = "https://github.com/yoshmiru/rtl8723cs";
     license = lib.licenses.gpl2;
     platforms = lib.platforms.linux;
-    maintainers = with maintainers; [ yoshmiru ];
   };
 }
