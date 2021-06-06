@@ -20722,6 +20722,8 @@ in
 
     rtl8723bs = callPackage ../os-specific/linux/rtl8723bs { };
 
+    rtl8723cs = callPackage ../os-specific/linux/rtl8723cs { };
+
     rtl8812au = callPackage ../os-specific/linux/rtl8812au { };
 
     rtl8814au = callPackage ../os-specific/linux/rtl8814au { };
