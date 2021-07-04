@@ -441,7 +441,7 @@ class Machine:
     def execute(self, command: str) -> Tuple[int, str]:
         self.connect()
 
-        out_command = "( {} ); echo '|!=EOF' $?\n".format(command)
+        out_command = "( set -euo pipefail; {} ); echo '|!=EOF' $?\n".format(command)
         self.shell.send(out_command.encode())
 
         output = ""
@@ -462,9 +462,10 @@ class Machine:
         Should only be used during test development, not in the production test."""
         self.connect()
         self.log("Terminal is ready (there is no prompt):")
-        telnet = telnetlib.Telnet()
-        telnet.sock = self.shell  # type: ignore
-        telnet.interact()
+        subprocess.run(
+            ["socat", "READLINE", f"FD:{self.shell.fileno()}"],
+            pass_fds=[self.shell.fileno()],
+        )
 
     def succeed(self, *commands: str) -> str:
         """Execute each command and check that it succeeds."""
@@ -907,7 +908,6 @@ class Machine:
 def create_machine(args: Dict[str, Any]) -> Machine:
     global log
     args["log"] = log
-    args["redirectSerial"] = os.environ.get("USE_SERIAL", "0") == "1"
     return Machine(args)
 
 
@@ -974,7 +974,7 @@ def subtest(name: str) -> Iterator[None]:
 
 
 if __name__ == "__main__":
-    arg_parser = argparse.ArgumentParser()
+    arg_parser = argparse.ArgumentParser(prog="nixos-test-driver")
     arg_parser.add_argument(
         "-K",
         "--keep-vm-state",
